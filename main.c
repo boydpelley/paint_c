@@ -1,5 +1,47 @@
 #include <stdio.h>
-#include "SDL2/SDL.h"
+#include <SDL2/SDL.h>
+
+short process_events(SDL_Window *window)
+{
+    SDL_Event event;
+
+    short done = 0;
+
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+            case SDL_WINDOWEVENT_CLOSE:
+            {
+                if (window)
+                {
+                    SDL_DestroyWindow(window);
+                    window = NULL;
+                    done = 1;
+                }
+            }
+            break;
+            case SDL_KEYDOWN:
+            {
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_ESCAPE:
+                    {
+                        done = 1;
+                        break;
+                    }
+                }
+            }
+            break;
+            case SDL_QUIT:
+            {
+                done = 1;
+            }
+            break;
+        }
+    }
+    return done;
+}
 
 int main(int argc, char *argv[])
 {
@@ -23,39 +65,10 @@ int main(int argc, char *argv[])
 
     while (!done)
     {
-        while (SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
-                case SDL_WINDOWEVENT_CLOSE:
-                {
-                    if (window)
-                    {
-                        SDL_DestroyWindow(window);
-                        window = NULL;
-                        done = 1;
-                    }
-                }
-                break;
-                case SDL_KEYDOWN:
-                {
-                    switch (event.key.keysym.sym)
-                    {
-                        case SDLK_ESCAPE:
-                        {
-                            done = 1;
-                            break;
-                        }
-                    }
-                }
-                break;
-                case SDL_QUIT:
-                {
-                    done = 1;
-                }
-                break;
-            }
-        }
+        done = process_events(window);
+
+        // Start rendering of window
+        SDL_SetRenderDrawColor(renderer, 63, 63, 63, 255);
     }
     return 0;
 }

@@ -20,3 +20,39 @@ Run Build Command(s):C:/Program Files/JetBrains/CLion 2022.2.4/bin/ninja/win/nin
 
 
 
+Determining if the include file pthread.h exists passed with the following output:
+Change Dir: C:/Users/boydj/git/personal/paint_c/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files/JetBrains/CLion 2022.2.4/bin/ninja/win/ninja.exe cmTC_64fd1 && [1/2] Building C object CMakeFiles/cmTC_64fd1.dir/CheckIncludeFile.c.obj
+[2/2] Linking C executable cmTC_64fd1.exe
+
+
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD succeeded with the following output:
+Change Dir: C:/Users/boydj/git/personal/paint_c/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files/JetBrains/CLion 2022.2.4/bin/ninja/win/ninja.exe cmTC_43c0d && [1/2] Building C object CMakeFiles/cmTC_43c0d.dir/src.c.obj
+[2/2] Linking C executable cmTC_43c0d.exe
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
