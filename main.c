@@ -106,8 +106,37 @@ void draw_grid(SDL_Renderer *renderer, paint_state *paint_state, int size)
             }
         }
     }
+}
 
+void save_to_bmp_file(paint_state *paint_state)
+{
+    printf("Please enter in the name (under 50 characters) of your new BEAUTIFUL art!\n");
+    char file_name[50];
+    scanf("%49[^\n]", file_name);
 
+    SDL_Surface *surface = SDL_CreateRGBSurface(0, 480, 480, 32, 0, 0, 0, 0);
+
+    for (int row = 0; row < 24; row++)
+    {
+        for (int col = 0; col < 24; col++)
+        {
+            if (paint_state->grid[row][col] != 255)
+            {
+                int colour_index = paint_state->grid[row][col];
+                colours cell_colour = paint_state->p.colours[colour_index];
+
+                Uint32 pixelColor = SDL_MapRGBA(surface->format, cell_colour.r, cell_colour.g, cell_colour.b, cell_colour.a);
+                int x = col * (paint_state->grid_rect.w / 24);
+                int y = row * (paint_state->grid_rect.h / 24);
+
+                SDL_Rect destRect = {x, y, paint_state->grid_rect.w / 24, paint_state->grid_rect.h / 24};
+
+                SDL_FillRect(surface, &destRect, pixelColor);
+            }
+        }
+    }
+    SDL_SaveBMP(surface, file_name);
+    SDL_FreeSurface(surface);
 }
 
 void handle_click(SDL_MouseButtonEvent *click, paint_state *paint_state)
@@ -115,7 +144,12 @@ void handle_click(SDL_MouseButtonEvent *click, paint_state *paint_state)
     int mouse_x = click->x;
     int mouse_y = click->y;
 
-    if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 0 && mouse_y <= 480)) {
+    if ( (mouse_x >= 490 && mouse_x <= 630) && (mouse_y >= 10 && mouse_y <= 80))
+    {
+        save_to_bmp_file(paint_state);
+    }
+
+    if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 80 && mouse_y <= 480)) {
         int col = (mouse_x - 490) / (60 + 10);
         int row = (mouse_y - 90) / (60 + 10);
         paint_state->selected_color = col + row * 2;
