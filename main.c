@@ -69,6 +69,12 @@ int main(int argc, char *argv[])
 
         // Start rendering of window
         SDL_SetRenderDrawColor(renderer, 63, 63, 63, 255);
+
+        SDL_RenderClear(renderer);
+
+        SDL_RenderPresent(renderer);
+
+        SDL_Delay(20);
     }
     return 0;
 }
