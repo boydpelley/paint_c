@@ -66,15 +66,33 @@ short process_events(SDL_Window *window)
 
 void draw_palette(SDL_Renderer *renderer, palette *palette)
 {
-    SDL_SetRenderDrawColor(renderer, )
+    // Render the palette rectangle
+    SDL_SetRenderDrawColor(renderer, 228, 228, 228, 255);
+    SDL_RenderFillRect(renderer, &palette->background);
+
+    // Render save button. Will use pink for now as a replacement for text
+    SDL_SetRenderDrawColor(renderer, 255, 50, 255, 255);
+    SDL_RenderFillRect(renderer, &palette->save_btn);
+
+    // Render colour boxes
+    for (int i  = 0; i < 8; i++)
+    {
+        SDL_Rect current_colour = {palette->colours[i].x, palette->colours[i].y,
+                                   palette->colours[i].width, palette->colours[i].height};
+        SDL_SetRenderDrawColor(renderer, palette->colours[i].r, palette->colours[i].g,
+                               palette->colours[i].b, palette->colours[i].a);
+        SDL_RenderFillRect(renderer, &current_colour);
+    }
 }
 
-void render_screen(SDL_Renderer *renderer)
+void render_screen(SDL_Renderer *renderer, paint_state *paint_state)
 {
     // Render a white screen
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     SDL_RenderClear(renderer);
+
+    draw_palette(renderer, &paint_state->p);
 
     SDL_RenderPresent(renderer);
 }
@@ -108,6 +126,7 @@ int main(int argc, char *argv[])
     SDL_Renderer *renderer = NULL;
 
     SDL_Init(SDL_INIT_VIDEO);
+    init_palette(&paint_state);
 
     window = SDL_CreateWindow("Paint Window",
                               SDL_WINDOWPOS_UNDEFINED,
@@ -128,7 +147,7 @@ int main(int argc, char *argv[])
     {
         done = process_events(window);
 
-        render_screen(renderer);
+        render_screen(renderer, &paint_state);
 
        // SDL_Delay(20);
     }
