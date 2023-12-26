@@ -110,9 +110,7 @@ void draw_grid(SDL_Renderer *renderer, paint_state *paint_state, int size)
 
 void save_to_bmp_file(paint_state *paint_state)
 {
-    printf("Please enter in the name (under 50 characters) of your new BEAUTIFUL art!\n");
-    char file_name[50];
-    scanf("%49[^\n]", file_name);
+    char * file_name = "drawing";
 
     SDL_Surface *surface = SDL_CreateRGBSurface(0, 480, 480, 32, 0, 0, 0, 0);
 
@@ -251,7 +249,6 @@ int main(int argc, char *argv[])
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     short done = 0;
-    SDL_Event event;
 
     while (!done)
     {
