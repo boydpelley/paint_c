@@ -148,13 +148,12 @@ void handle_click(SDL_MouseButtonEvent *click, paint_state *paint_state)
     {
         save_to_bmp_file(paint_state);
     }
-
-    if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 80 && mouse_y <= 480)) {
+    else if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 80 && mouse_y <= 480)) {
         int col = (mouse_x - 490) / (60 + 10);
         int row = (mouse_y - 90) / (60 + 10);
         paint_state->selected_color = col + row * 2;
     }
-    else
+    else if ( (mouse_x >= 0 && mouse_x <= 480) && (mouse_y >= 0 && mouse_y <= 480))
     {
         int cell_x = (mouse_x - paint_state->grid_rect.x) / (paint_state->grid_rect.w / 24);
         int cell_y = (mouse_y - paint_state->grid_rect.y) / (paint_state->grid_rect.h / 24);
