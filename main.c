@@ -115,9 +115,11 @@ void handle_click(SDL_MouseButtonEvent *click, paint_state *paint_state)
     int mouse_x = click->x;
     int mouse_y = click->y;
 
-    if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 0 && mouse_y <= 480))
-    {
-        paint_state->selected_color = (mouse_y - paint_state->p.background.y) / (paint_state->p.background.h / sizeof(paint_state->p.colours));
+    if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 0 && mouse_y <= 480)) {
+        int row = (mouse_y - paint_state->p.background.y) / ((paint_state->p.background.h - 10) / 4);
+        int col = (mouse_x - paint_state->p.background.x) / ((paint_state->p.background.w - 10) / 2);
+
+        paint_state->selected_color = col + row * 2;
     }
     else
     {
@@ -163,7 +165,7 @@ short process_events(SDL_Window *window, paint_state *state)
                     done = 1;
                 }
             }
-                break;
+            break;
             case SDL_KEYDOWN:
             {
                 switch (event.key.keysym.sym)
@@ -175,18 +177,17 @@ short process_events(SDL_Window *window, paint_state *state)
                     }
                 }
             }
-                break;
+            break;
             case SDL_QUIT:
             {
                 done = 1;
             }
-                break;
+            break;
             case SDL_MOUSEBUTTONDOWN:
             {
                 handle_click(&event.button, state);
                 break;
             }
-                break;
         }
     }
     return done;
@@ -204,6 +205,9 @@ int main(int argc, char *argv[])
     paint_state.grid_rect = (SDL_Rect){0, 0, 480, 480};
     memset(paint_state.grid, 255, sizeof(paint_state.grid));
 
+    // Initialize default drawing colour to black
+    paint_state.selected_color = 6;
+
     window = SDL_CreateWindow("Paint Window",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
@@ -214,8 +218,6 @@ int main(int argc, char *argv[])
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    //paint_state.renderer = renderer;
-
     short done = 0;
     SDL_Event event;
 
@@ -224,8 +226,6 @@ int main(int argc, char *argv[])
         done = process_events(window, &paint_state);
 
         render_screen(renderer, &paint_state);
-
-       // SDL_Delay(20);
     }
     return 0;
 }
