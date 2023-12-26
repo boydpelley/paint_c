@@ -88,6 +88,25 @@ void draw_grid(SDL_Renderer *renderer, paint_state *paint_state, int size)
         SDL_RenderDrawLine(renderer, x, i, x + w, i);
     }
 
+    for (int row = 0; row < 24; ++row)
+    {
+        for (int col = 0; col < 24; ++col)
+        {
+            if (paint_state->grid[row][col] != 255) // 255 is the default value for an uninitialized cell
+            {
+                int colorIndex = paint_state->grid[row][col];
+                colours cell_colour = paint_state->p.colours[colorIndex];
+                SDL_Rect cell_rect = {paint_state->grid_rect.x + col * (paint_state->grid_rect.w / 24),
+                                     paint_state->grid_rect.y + row * (paint_state->grid_rect.h / 24),
+                                     paint_state->grid_rect.w / 24,
+                                     paint_state->grid_rect.h / 24};
+
+                SDL_SetRenderDrawColor(renderer, cell_colour.r, cell_colour.g, cell_colour.b, cell_colour.a);
+                SDL_RenderFillRect(renderer, &cell_rect);
+            }
+        }
+    }
+
 
 }
 
@@ -105,7 +124,7 @@ void handle_click(SDL_MouseButtonEvent *click, paint_state *paint_state)
         int cell_x = (mouse_x - paint_state->grid_rect.x) / (paint_state->grid_rect.w / 24);
         int cell_y = (mouse_y - paint_state->grid_rect.y) / (paint_state->grid_rect.h / 24);
 
-        paint_state->grid[cell_x][cell_y] = paint_state->selected_color;
+        paint_state->grid[cell_y][cell_x] = paint_state->selected_color;
     }
 }
 
@@ -181,7 +200,9 @@ int main(int argc, char *argv[])
 
     SDL_Init(SDL_INIT_VIDEO);
     init_palette(&paint_state);
+
     paint_state.grid_rect = (SDL_Rect){0, 0, 480, 480};
+    memset(paint_state.grid, 255, sizeof(paint_state.grid));
 
     window = SDL_CreateWindow("Paint Window",
                               SDL_WINDOWPOS_UNDEFINED,
