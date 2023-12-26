@@ -116,9 +116,8 @@ void handle_click(SDL_MouseButtonEvent *click, paint_state *paint_state)
     int mouse_y = click->y;
 
     if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 0 && mouse_y <= 480)) {
-        int row = (mouse_y - paint_state->p.background.y) / ((paint_state->p.background.h - 10) / 4);
-        int col = (mouse_x - paint_state->p.background.x) / ((paint_state->p.background.w - 10) / 2);
-
+        int col = (mouse_x - 490) / (60 + 10);
+        int row = (mouse_y - 90) / (60 + 10);
         paint_state->selected_color = col + row * 2;
     }
     else
