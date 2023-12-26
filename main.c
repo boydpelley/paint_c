@@ -1,6 +1,27 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
+typedef struct
+{
+    int x, y, width, height;
+    Uint8 r, g, b, a;
+} colours;
+
+typedef struct
+{
+    SDL_Rect background;
+    colours colours[8];
+    SDL_Rect save_btn;
+} palette;
+
+typedef struct
+{
+    // Define the right side of the screen
+
+    palette p;
+
+} paint_state;
+
 short process_events(SDL_Window *window)
 {
     SDL_Event event;
@@ -43,8 +64,33 @@ short process_events(SDL_Window *window)
     return done;
 }
 
+void draw_palette(SDL_Renderer *renderer, palette *palette)
+{
+    SDL_SetRenderDrawColor(renderer, )
+}
+
+void render_screen(SDL_Renderer *renderer)
+{
+    // Render a white screen
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    SDL_RenderClear(renderer);
+
+    SDL_RenderPresent(renderer);
+}
+
+void init_palette(paint_state *paint_state)
+{
+    // Initialize palette background
+    paint_state->p.background = (SDL_Rect){480, 0, 160, 480};
+
+    // Initialize colours
+    paint_state->p.colours[0] =
+}
+
 int main(int argc, char *argv[])
 {
+    paint_state paint_state;
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
@@ -58,7 +104,9 @@ int main(int argc, char *argv[])
                               0
                               );
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    //paint_state.renderer = renderer;
 
     short done = 0;
     SDL_Event event;
@@ -67,14 +115,9 @@ int main(int argc, char *argv[])
     {
         done = process_events(window);
 
-        // Start rendering of window
-        SDL_SetRenderDrawColor(renderer, 63, 63, 63, 255);
+        render_screen(renderer);
 
-        SDL_RenderClear(renderer);
-
-        SDL_RenderPresent(renderer);
-
-        SDL_Delay(20);
+       // SDL_Delay(20);
     }
     return 0;
 }
