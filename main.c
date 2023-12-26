@@ -17,8 +17,10 @@ typedef struct
 typedef struct
 {
     // Define the right side of the screen
-
     palette p;
+    Uint8 selected_color;
+    SDL_Rect grid_rect;
+    Uint8 grid[24][24];
 
 } paint_state;
 
@@ -44,47 +46,7 @@ void init_palette(paint_state *paint_state)
     paint_state->p.save_btn = (SDL_Rect){490, 10, 140, 60};
 }
 
-short process_events(SDL_Window *window)
-{
-    SDL_Event event;
 
-    short done = 0;
-
-    while (SDL_PollEvent(&event))
-    {
-        switch (event.type)
-        {
-            case SDL_WINDOWEVENT_CLOSE:
-            {
-                if (window)
-                {
-                    SDL_DestroyWindow(window);
-                    window = NULL;
-                    done = 1;
-                }
-            }
-            break;
-            case SDL_KEYDOWN:
-            {
-                switch (event.key.keysym.sym)
-                {
-                    case SDLK_ESCAPE:
-                    {
-                        done = 1;
-                        break;
-                    }
-                }
-            }
-            break;
-            case SDL_QUIT:
-            {
-                done = 1;
-            }
-            break;
-        }
-    }
-    return done;
-}
 
 void draw_palette(SDL_Renderer *renderer, palette *palette)
 {
@@ -107,9 +69,14 @@ void draw_palette(SDL_Renderer *renderer, palette *palette)
     }
 }
 
-void draw_grid(SDL_Renderer *renderer, int x, int y, int w, int h, int size)
+void draw_grid(SDL_Renderer *renderer, paint_state *paint_state, int size)
 {
     SDL_SetRenderDrawColor(renderer, 61, 61, 61, 255);
+
+    int x = paint_state->grid_rect.x;
+    int y = paint_state->grid_rect.y;
+    int w = paint_state->grid_rect.w;
+    int h = paint_state->grid_rect.h;
 
     for (int i = x + size; i < x + w; i += size)
     {
@@ -119,6 +86,26 @@ void draw_grid(SDL_Renderer *renderer, int x, int y, int w, int h, int size)
     for (int i = y + size; i < y + h; i += size)
     {
         SDL_RenderDrawLine(renderer, x, i, x + w, i);
+    }
+
+
+}
+
+void handle_click(SDL_MouseButtonEvent *click, paint_state *paint_state)
+{
+    int mouse_x = click->x;
+    int mouse_y = click->y;
+
+    if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 0 && mouse_y <= 480))
+    {
+        paint_state->selected_color = (mouse_y - paint_state->p.background.y) / (paint_state->p.background.h / sizeof(paint_state->p.colours));
+    }
+    else
+    {
+        int cell_x = (mouse_x - paint_state->grid_rect.x) / (paint_state->grid_rect.w / 24);
+        int cell_y = (mouse_y - paint_state->grid_rect.y) / (paint_state->grid_rect.h / 24);
+
+        paint_state->grid[cell_x][cell_y] = paint_state->selected_color;
     }
 }
 
@@ -133,12 +120,58 @@ void render_screen(SDL_Renderer *renderer, paint_state *paint_state)
     draw_palette(renderer, &paint_state->p);
 
     // Draw grid on left side of screen
-    draw_grid(renderer, 0, 0, 480, 480, 20);
+    draw_grid(renderer, paint_state, 20);
 
     SDL_RenderPresent(renderer);
 }
 
+short process_events(SDL_Window *window, paint_state *state)
+{
+    SDL_Event event;
 
+    short done = 0;
+
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+            case SDL_WINDOWEVENT_CLOSE:
+            {
+                if (window)
+                {
+                    SDL_DestroyWindow(window);
+                    window = NULL;
+                    done = 1;
+                }
+            }
+                break;
+            case SDL_KEYDOWN:
+            {
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_ESCAPE:
+                    {
+                        done = 1;
+                        break;
+                    }
+                }
+            }
+                break;
+            case SDL_QUIT:
+            {
+                done = 1;
+            }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+            {
+                handle_click(&event.button, state);
+                break;
+            }
+                break;
+        }
+    }
+    return done;
+}
 
 int main(int argc, char *argv[])
 {
@@ -148,6 +181,7 @@ int main(int argc, char *argv[])
 
     SDL_Init(SDL_INIT_VIDEO);
     init_palette(&paint_state);
+    paint_state.grid_rect = (SDL_Rect){0, 0, 480, 480};
 
     window = SDL_CreateWindow("Paint Window",
                               SDL_WINDOWPOS_UNDEFINED,
@@ -166,7 +200,7 @@ int main(int argc, char *argv[])
 
     while (!done)
     {
-        done = process_events(window);
+        done = process_events(window, &paint_state);
 
         render_screen(renderer, &paint_state);
 
