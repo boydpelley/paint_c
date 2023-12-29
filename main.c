@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include <stdbool.h>
 
 typedef struct
 {
@@ -137,27 +138,56 @@ void save_to_bmp_file(paint_state *paint_state)
     SDL_FreeSurface(surface);
 }
 
-void handle_click(SDL_MouseButtonEvent *click, paint_state *paint_state)
+bool mouse_down = false;
+
+void handle_click(SDL_Event *mouse_e, paint_state *paint_state)
 {
-    int mouse_x = click->x;
-    int mouse_y = click->y;
+    int mouse_x = mouse_e->button.x;
+    int mouse_y = mouse_e->button.y;
 
-    if ( (mouse_x >= 490 && mouse_x <= 630) && (mouse_y >= 10 && mouse_y <= 80))
+    switch (mouse_e->type)
     {
-        save_to_bmp_file(paint_state);
-    }
-    else if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 80 && mouse_y <= 480)) {
-        int col = (mouse_x - 490) / (60 + 10);
-        int row = (mouse_y - 90) / (60 + 10);
-        paint_state->selected_color = col + row * 2;
-    }
-    else if ( (mouse_x >= 0 && mouse_x <= 480) && (mouse_y >= 0 && mouse_y <= 480))
-    {
-        int cell_x = (mouse_x - paint_state->grid_rect.x) / (paint_state->grid_rect.w / 24);
-        int cell_y = (mouse_y - paint_state->grid_rect.y) / (paint_state->grid_rect.h / 24);
+        case SDL_MOUSEBUTTONDOWN:
+        {
+            mouse_down = true;
 
-        paint_state->grid[cell_y][cell_x] = paint_state->selected_color;
+            if ( (mouse_x >= 490 && mouse_x <= 630) && (mouse_y >= 10 && mouse_y <= 80))
+            {
+                save_to_bmp_file(paint_state);
+            }
+            else if ( (mouse_x >= 480 && mouse_x <= 640) && (mouse_y >= 80 && mouse_y <= 480)) {
+                int col = (mouse_x - 490) / (60 + 10);
+                int row = (mouse_y - 90) / (60 + 10);
+                paint_state->selected_color = col + row * 2;
+            }
+            else if ( (mouse_x >= 0 && mouse_x <= 480) && (mouse_y >= 0 && mouse_y <= 480))
+            {
+                int cell_x = (mouse_x - paint_state->grid_rect.x) / (paint_state->grid_rect.w / 24);
+                int cell_y = (mouse_y - paint_state->grid_rect.y) / (paint_state->grid_rect.h / 24);
+
+                paint_state->grid[cell_y][cell_x] = paint_state->selected_color;
+            }
+            break;
+        }
+        case SDL_MOUSEBUTTONUP:
+        {
+            mouse_down = false;
+            break;
+        }
+        case SDL_MOUSEMOTION:
+        {
+            if ( mouse_down && (mouse_x >= 0 && mouse_x <= 480) && (mouse_y >= 0 && mouse_y <= 480) )
+            {
+                int cell_x = (mouse_x - paint_state->grid_rect.x) / (paint_state->grid_rect.w / 24);
+                int cell_y = (mouse_y - paint_state->grid_rect.y) / (paint_state->grid_rect.h / 24);
+
+                paint_state->grid[cell_y][cell_x] = paint_state->selected_color;
+            }
+            break;
+        }
     }
+
+
 }
 
 void render_screen(SDL_Renderer *renderer, paint_state *paint_state)
@@ -214,10 +244,10 @@ short process_events(SDL_Window *window, paint_state *state)
             }
             break;
             case SDL_MOUSEBUTTONDOWN:
-            {
-                handle_click(&event.button, state);
+            case SDL_MOUSEBUTTONUP:
+            case SDL_MOUSEMOTION:
+                handle_click(&event, state);
                 break;
-            }
         }
     }
     return done;
