@@ -23,7 +23,6 @@ There is only two types of input being tracked:
 
 ## Future Additions / Considerations
 
-+ Draw by clicking and holding the mouse over multiple squares
 + Be able to name files
 + Load files from memory and edit them
 + Change the size of the screen and grid
