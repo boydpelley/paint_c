@@ -19,7 +19,7 @@ As of right now, the pink box in the top right of the program is the "Save" butt
 
 There is only two types of input being tracked:
 1. Esc - To exit and end the program
-2. Left-Click - To select clours and draw squares
+2. Left-Click - To select colours and draw squares (left-click can be held in for drag drawing)
 
 ## Future Additions / Considerations
 
